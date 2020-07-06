@@ -5,32 +5,24 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.InvalidParameterException;
 import java.util.Properties;
+
+import static java.util.Objects.isNull;
 
 /**
  * configファイルからトークン生成用シークレットやDB設定値を読み込む
  */
 public class LoadConfigurations {
     private static final String CONFIG_FILE_NAME = "config";
+    private static final String CONFIG_FILE_PATH_ENV_NAME = "config_file_path";
     private static final Properties properties;
 
-    private LoadConfigurations(){
-    }
-
     static {
-        /*
-            力技WEB-INFのパス取得取得
-            1. ダミーでこのクラスのインスタンスを作る
-            2. 作ったダミーからClassLoaderを経由してWEB-INF/Classesに作られるディレクトリの実際のパスを取得
-            3. その親の親がWEB-INFなのでそのパスにCONFIG_FILE_NAMEをつけて設定ファイルまでのパスが完成
-         */
-        LoadConfigurations forGetRealPath = new LoadConfigurations();
-        URL resourceUrl = forGetRealPath.getClass().getClassLoader().getResource("LibraryManager");
-        String path = resourceUrl.toString().replace("file:","")+"../../" + CONFIG_FILE_NAME;
-
         properties = new Properties();
+        String configFilePath = getFilePath(CONFIG_FILE_PATH_ENV_NAME);
         try {
-            try (BufferedReader configfile = Files.newBufferedReader(Paths.get(path))){
+            try (BufferedReader configfile = Files.newBufferedReader(Paths.get(configFilePath))){
                 properties.load(configfile);
             }
         }catch (IOException e){
@@ -40,7 +32,25 @@ public class LoadConfigurations {
 
     public static String get(String key){
         // keyだけでも良いが、キーがない時のためにdefaultValueを設定しておく。
-        //@TODO 確認。対象のキーが無い時はExceptionか""(空を返すか)
         return properties.getProperty(key, "");
+    }
+
+    /**
+     * 環境変数/システムプロパティに設定された接続情報などを取り出す。
+     * システムプロパティと環境変数どちらにも値が登録されていたときは、環境変数の値を優先する。
+     * @param key 取得したいプロパティのkeyの名前
+     * @return そのプロパティの値
+     * @throws InvalidParameterException 指定されたプロパティが環境変数とシステムプロパティどちらにも登録されていなかった時
+     */
+    public static String getFilePath(String key){
+        String requested_value;
+        requested_value = System.getenv(key);
+        if(isNull(requested_value)){
+            requested_value = System.getProperty(key, "");
+        }
+        if(requested_value.isEmpty()){
+            throw new InvalidParameterException();
+        }
+        return requested_value;
     }
 }

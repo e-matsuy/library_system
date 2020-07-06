@@ -27,13 +27,10 @@
     1. apply
     1. Run して デフォルトブラウザが開いてWebページが表示されれば完了
     
-1. 環境変数の設定
+1. 環境変数/システムプロパティの設定
 
     システムは以下の環境変数またはシステムプロパティを参照する
-    * jdbc_url: データベースへの接続につあうjdbcurl
-    * user_name: データベースへ接続するユーザー名
-    * password: データベースへ接続するユーザー名
-    * secret: トークンへの署名を作成する際のシークレット/任意の文字列
+    * config_file_path: 設定ファイルの絶対パス
     1. システムプロパティを設定する(開発環境を想定)
     
         システムの実行の際にVMの起動オプションを設定
@@ -46,3 +43,18 @@
         ```shell
            $ export name=value
         ```
+1. 設定ファイルを配置する
+    
+    システムの以下のプロパティをファイルに記載し前項で指定した場所に配置する。
+    * secret: トークン生成時に署名するためのシークレット
+    * jdbc_url: データベースへ接続するためのjbdcurl
+    * user_name: データベースへ接続する際のユーザー名
+    * password: データベースへ接続する際のパスワード
+    
+    書式は`java.util.Properties`が扱える形式とする。
+    > https://docs.oracle.com/javase/jp/8/docs/api/java/util/Properties.html#load-java.io.Reader-
+                                                                                                   
+    ```:config
+    secret=this_is_secret
+    jdbc_url=jdbc://hogheog    
+    ```
