@@ -38,7 +38,7 @@ CREATE TABLE book_master (
 
 CREATE TABLE users (
   id serial primary key, 
-  enployee_number text NOT NULL,
+  employee_number text NOT NULL,
   name text NOT NULL,
   name_kana text NOT NULL,
   mail_address text NOT NULL,
