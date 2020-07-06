@@ -1,2 +1,2 @@
-jwt_key.secret
+src/main/webapp/WEB-INF/config
 target/*
