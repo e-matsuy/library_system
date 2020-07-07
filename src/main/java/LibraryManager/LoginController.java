@@ -4,7 +4,6 @@ import LibraryManager.datamodel.LoginRequest;
 import LibraryManager.datamodel.LoginResponse;
 import LibraryManager.datamodel.User;
 import LibraryManager.service.UserDataService;
-import LibraryManager.util.GsonSingleton;
 import LibraryManager.util.PasswordCertificator;
 import LibraryManager.util.TokenCertificator;
 
@@ -27,7 +26,6 @@ public final class LoginController extends AbstractController{
         User requestUser = null;
         String generatedToken = "";
         userDataService = new UserDataService();
-
         try{
             requestUser = userDataService.getUserByEmployeeNumber(request.employeeNumber());
         }catch (SQLException sqlException){

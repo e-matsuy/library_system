@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>図書管理システム</title>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/login.css">
+</head>
+<body>
+<header><p>図書管理システム</p></header>
+<div id="login">
+    <h1>ユーザー認証</h1>
+    <form>
+        <input name="employee_number" pattern="^[0-9]+$" placeholder="社員番号" required>
+        <input name="password" type="password" placeholder="パスワード" required>
+        <button id="submit">ログイン</button>
+    </form>
+</div>
+</body>
+<script src="js/common.js"></script>
+<script src="js/login.js"></script>
+</html>

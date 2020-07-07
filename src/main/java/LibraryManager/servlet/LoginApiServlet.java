@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @WebServlet(name="LibraryManager", urlPatterns = {"/api/login"})
 public class LoginApiServlet extends HttpServlet {
@@ -26,10 +29,8 @@ public class LoginApiServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // request/responseの設定
-        req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType(CONTENT_TYPE_JSON + "; charset=UTF-8");
-
         LoginRequest request = GsonSingleton.fromJson(req.getReader(), LoginRequest.class);
         String responseBody = loginController.login(request);
         resp.getWriter().println(responseBody);
