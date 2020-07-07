@@ -122,7 +122,9 @@
         <artifactId>tomcat7-maven-plugin</artifactId>
         <version>2.2</version>
         <configuration>
-          <path>/</path>
+          <path>/LibraryManagement_war</path>
+          <server>tomcat-localhost</server>
+          <url>http://localhost:8080/LibraryManagement_war</url>
         </configuration>
       </plugin>
     </plugins>

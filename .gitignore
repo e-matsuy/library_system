@@ -1,2 +1,3 @@
-src/main/webapp/WEB-INF/config
+config
 target/*
+.DS_store

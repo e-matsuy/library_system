@@ -1,11 +1,19 @@
 package LibraryManager.util;
 
+import LibraryManager.datamodel.LoginRequest;
+import LibraryManager.datamodel.User;
+import LibraryManager.service.UserDataService;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+
+import static java.util.Objects.isNull;
 
 /**
  * パスワードを暗号化する。
@@ -76,5 +84,18 @@ public final class PasswordCertificator {
         }
         messageDigest.update(salt.getBytes());
         return messageDigest.digest();
+    }
+
+    /**
+     * 従業員番号とパスワードで認証を行う
+     * @param request ログインリクエスト情報を持ったオブジェクト
+     * @return 認証結果
+     */
+    public static boolean passwordCertificate(LoginRequest request, User user){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        UserDataService userDataService = new UserDataService();
+        String storedPassword = user.password();
+        String hashedPassword = passwordEncryption(request.password(), simpleDateFormat.format(user.dateOfHire()));
+        return storedPassword.equals(hashedPassword);
     }
 }

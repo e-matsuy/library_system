@@ -14,7 +14,10 @@ import static java.util.Objects.isNull;
  * configファイルからトークン生成用シークレットやDB設定値を読み込む
  */
 public class LoadConfigurations {
-    private static final String CONFIG_FILE_NAME = "config";
+    private static final String JDBC_URL_CONFIG_KEYNAME = "jdbc_url";
+    private static final String DATABASE_USER_NAME_CONFIG_KEYNAME = "user_name";
+    private static final String DATABASE_PASSWORD_CONFIG_KEYNAME = "password";
+    private static final String TOKEN_SECRET_CONFIG_KEYNAME = "secret";
     private static final String CONFIG_FILE_PATH_ENV_NAME = "config_file_path";
     private static final Properties properties;
 
@@ -33,6 +36,22 @@ public class LoadConfigurations {
     public static String get(String key){
         // keyだけでも良いが、キーがない時のためにdefaultValueを設定しておく。
         return properties.getProperty(key, "");
+    }
+
+    public static String getJdbcUrl(){
+        return get(JDBC_URL_CONFIG_KEYNAME);
+    }
+
+    public static String getDatabaseUserName(){
+        return get(DATABASE_USER_NAME_CONFIG_KEYNAME);
+    }
+
+    public static String getDatabasePassword(){
+        return get(DATABASE_PASSWORD_CONFIG_KEYNAME);
+    }
+
+    public static String getTokenSecret(){
+        return get(TOKEN_SECRET_CONFIG_KEYNAME);
     }
 
     /**
