@@ -1,20 +1,19 @@
 package LibraryManager.util;
 
-import LibraryManager.datamodel.DataTrasferObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.Reader;
 
 public final class GsonSingleton {
-    private static final Gson GSON_INSTANCE = new GsonBuilder().setLenient().create();
+    private static final Gson GSON_INSTANCE = new GsonBuilder().setLenient().serializeNulls().create();
 
     public static synchronized <T> T fromJson(String jsonString, Class<T> classoft){
-        return (T) GSON_INSTANCE.fromJson(jsonString, classoft);
+        return GSON_INSTANCE.fromJson(jsonString, classoft);
     }
 
     public static synchronized <T> T fromJson(Reader jsonReader, Class<T> classoft){
-        return (T) GSON_INSTANCE.fromJson(jsonReader, classoft);
+        return GSON_INSTANCE.fromJson(jsonReader, classoft);
     }
 
     public static synchronized String toJson(Object object){
