@@ -9,11 +9,16 @@ public class Mail implements DataTrasferObject{
     private final String mailTo;
     private final String subject;
     private final String body;
+    private String token = null;
 
     public Mail(String displayName, String mailTo, String subject, String body){
         this.displayName = displayName;
         this.mailTo = mailTo;
         this.subject = subject;
         this.body = body;
+    }
+
+    public void setToken(String token){
+        this.token = token;
     }
 }

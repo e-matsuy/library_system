@@ -24,7 +24,7 @@ public class PostClient {
 
         try (Response response = okHttpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                System.out.println("error!!");
+                System.out.println(response);
             }
             if (response.body() != null) {
                 return response.body().string();

@@ -45,6 +45,10 @@ public class UserDataService {
                 throw new NullPointerException();
             }
         }catch (SQLException sqlException){
+            /*
+             SQL 接続エラー以外のSQLExceptionなのでひとまず閉じる。
+             このときこのメソッドの戻り値はnullになる
+             */
             dataBaseController.close();
         }
         return target;
@@ -62,8 +66,13 @@ public class UserDataService {
                 target = parseDbdata(resultSet);
             }
         }catch (SQLException sqlException){
+            /*
+             SQL 接続エラー以外のSQLExceptionなのでひとまず閉じる。
+             このときこのメソッドの戻り値はnullになる
+             */
             dataBaseController.close();
         }
         return target;
     }
+
 }

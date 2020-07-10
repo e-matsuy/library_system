@@ -27,13 +27,13 @@ CREATE TABLE book_master (
   title text NOT NULL,
   author text NOT NULL,
   publisher integer NOT NULL,
-  caterory integer NOT NULL,
+  category integer NOT NULL,
   isbn varchar(20) NOT NULL,
   created_at timestamp NOT NULL DEFAULT current_timestamp,
   updated_at timestamp NOT NULL DEFAULT current_timestamp,
   deleted_at timestamp,
   FOREIGN KEY (publisher) REFERENCES publishers(id),
-  FOREIGN KEY (caterory) REFERENCES categories(id)
+  FOREIGN KEY (category) REFERENCES categories(id)
 );
 
 CREATE TABLE users (

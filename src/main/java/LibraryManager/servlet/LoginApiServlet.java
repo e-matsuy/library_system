@@ -3,12 +3,7 @@ package LibraryManager.servlet;
 
 import LibraryManager.LoginController;
 import LibraryManager.datamodel.LoginRequest;
-import LibraryManager.datamodel.LoginResponse;
-import LibraryManager.datamodel.User;
-import LibraryManager.service.UserDataService;
 import LibraryManager.util.GsonSingleton;
-import LibraryManager.util.PasswordCertificator;
-import LibraryManager.util.TokenCertificator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,10 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.stream.Collectors;
-
-import static java.util.Objects.isNull;
 
 @WebServlet(name="LibraryManager", urlPatterns = {"/api/login"})
 public class LoginApiServlet extends HttpServlet {

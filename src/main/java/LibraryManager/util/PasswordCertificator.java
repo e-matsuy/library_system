@@ -93,7 +93,6 @@ public final class PasswordCertificator {
      */
     public static boolean passwordCertificate(LoginRequest request, User user){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        UserDataService userDataService = new UserDataService();
         String storedPassword = user.password();
         String hashedPassword = passwordEncryption(request.password(), simpleDateFormat.format(user.dateOfHire()));
         return storedPassword.equals(hashedPassword);
