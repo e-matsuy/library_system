@@ -1,8 +1,8 @@
 package LibraryManager.servlet;
 
-
-import LibraryManager.LoginController;
-import LibraryManager.datamodel.LoginRequest;
+import LibraryManager.MasterDataController;
+import LibraryManager.datamodel.AddBookMasterRequest;
+import LibraryManager.datamodel.AddPublisherRequest;
 import LibraryManager.util.GsonSingleton;
 
 import javax.servlet.ServletException;
@@ -12,10 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name="LibraryManager", urlPatterns = {"/api/login"})
-public class LoginApiServlet extends HttpServlet {
-    static final String CONTENT_TYPE_JSON = "application/json";
-    LoginController loginController = new LoginController();
+@WebServlet(name="bookmasterApi", urlPatterns = {"/api/bookdata"})
+public class BookDataMasterServlet extends HttpServlet implements NeedAuth, ReturnJson {
+    MasterDataController controller = new MasterDataController();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -23,8 +22,10 @@ public class LoginApiServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType(CONTENT_TYPE_JSON + "; charset=UTF-8");
-        LoginRequest request = GsonSingleton.fromJson(req.getReader(), LoginRequest.class);
-        String responseBody = loginController.login(request);
+        String token = extractToken(req);
+        AddBookMasterRequest request = GsonSingleton.fromJson(req.getReader(), AddBookMasterRequest.class);
+        String responseBody = controller.addBookMasterData(token, request);
         resp.getWriter().println(responseBody);
     }
+
 }

@@ -12,9 +12,13 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import java.sql.SQLException;
 
 public abstract class AbstractController {
-    protected static String DATABASE_CONNECTION_ERROR_MESSAGE = "データベース接続に問題が発生しました";
-    protected static String INVALID_TOKEN_ERROR_MESSAGE = "認証情報に問題があるようです。ログインし直してください";
-    protected static String EXPIRED_TOKEN_ERROR_MESSAGE = "認証情報の期限がきれています。ログインし直してください";
+    protected final static String DATABASE_CONNECTION_ERROR_MESSAGE = "データベース接続に問題が発生しました";
+    protected final static String INVALID_TOKEN_ERROR_MESSAGE = "認証情報に問題があるようです。ログインし直してください";
+    protected final static String EXPIRED_TOKEN_ERROR_MESSAGE = "認証情報の期限がきれています。ログインし直してください";
+    protected final static String FOREIGN_KEY_ERROR_MESSAGE = "存在しないユーザーや書籍情報,ジャンル情報が指定されています";
+    protected final static String INSERT_FAILED_ERROR_MESSAGE = "データの追加に失敗しました";
+    protected final static String INVALID_USER_REQUEST_MESSAGE = "一般ユーザーに許可されていないリクエストです";
+    protected final static String INVALID_REQUEST_MESSAGE = "無効なリクエストです";
     protected User requestUser = null;
     String jsonString = null;
 

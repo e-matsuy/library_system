@@ -3,8 +3,10 @@ package LibraryManager.service;
 import LibraryManager.datamodel.*;
 import LibraryManager.util.DataBaseController;
 import LibraryManager.util.GsonSingleton;
+import org.postgresql.util.PSQLException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,14 +16,14 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-public class BookDataService {
+public class BookDataService extends AbstractService {
     private final String GET_BOOK_DATA_QUERY_BASE = "select books.id, books.book as book_master_id, book_master.title, book_master.author as author, book_master.publisher as publisher_id, publishers.name as publisher_name, book_master.category as category_id, categories.name as category_name, lending_records.return_schedule as return_schedule, book_master.isbn, books.last_use_log as last_use_log, lending_records.user_id as last_user_id, users.name as last_user_name, lending_records.updated_at as last_use_date, lending_records.returned_date as returned_date from books LEFT OUTER JOIN book_master ON books.book = book_master.id LEFT OUTER JOIN publishers ON book_master.publisher = publishers.id LEFT OUTER JOIN categories ON book_master.category = categories.id LEFT OUTER JOIN lending_records ON books.last_use_log = lending_records.id LEFT OUTER JOIN users ON lending_records.user_id = users.id ";
     private final String GET_BOOK_DATA_COUNT_QUERY_BASE = "select count(*) from books LEFT OUTER JOIN book_master ON books.book = book_master.id LEFT OUTER JOIN publishers ON book_master.publisher = publishers.id LEFT OUTER JOIN categories ON book_master.category = categories.id LEFT OUTER JOIN lending_records ON books.last_use_log = lending_records.id LEFT OUTER JOIN users ON lending_records.user_id = users.id ";
     private final String LIMIT_QUERY = "LIMIT ? OFFSET ? ";
+    private final String INSERT_BOOK_QUERY = "insert into books (book, bought_date, purchaser) values (?, ?, ?);";
+    private final String INSERT_BOOK_MASTER_QUERY = "insert into book_master (title, author, publisher, category, isbn) values (?, ?, ?, ?, ?) RETURNING id;";
     private final String LENDING_BOOKS_WHERE_QUERY = "WHERE lending_records.user_id = ? AND lending_records.returned_date IS NULL ";
     private final String OVERDUE_WHERE_QUERY = "WHERE lending_records.return_schedule < CURRENT_DATE AND lending_records.returned_date IS NULL ";
-    private DataBaseController dataBaseController = null;
-    private PreparedStatement preparedStatement = null;
     private List<Book> tergets = null;
     private ResultSet resultSet = null;
     private String queryForPreparedStatement = "";
@@ -218,10 +220,10 @@ public class BookDataService {
         StringBuilder queryBuilder = new StringBuilder();
         if (forCount) {
             queryBuilder.append(GET_BOOK_DATA_COUNT_QUERY_BASE);
-        }else{
+        } else {
             queryBuilder.append(GET_BOOK_DATA_QUERY_BASE);
         }
-            queryBuilder.append(LENDING_BOOKS_WHERE_QUERY);
+        queryBuilder.append(LENDING_BOOKS_WHERE_QUERY);
         return queryBuilder.toString();
     }
 
@@ -230,7 +232,7 @@ public class BookDataService {
         StringBuilder queryBuilder = new StringBuilder();
         if (forCount) {
             queryBuilder.append(GET_BOOK_DATA_COUNT_QUERY_BASE)
-                        .append(OVERDUE_WHERE_QUERY);
+                    .append(OVERDUE_WHERE_QUERY);
         } else {
             queryBuilder.append(GET_BOOK_DATA_QUERY_BASE)
                     .append(OVERDUE_WHERE_QUERY)
@@ -239,7 +241,7 @@ public class BookDataService {
         return queryBuilder.toString();
     }
 
-    private PreparedStatement createStatement(DataBaseController controller, BookListRequest request, User requestUser) throws SQLException{
+    private PreparedStatement createStatement(DataBaseController controller, BookListRequest request, User requestUser) throws SQLException {
         PreparedStatement preparedStatement = null;
         String queryForPreparedStatement;
         /* 特殊なリストの要求かを確認 */
@@ -256,13 +258,12 @@ public class BookDataService {
             preparedStatement.setInt(1, request.size());
             preparedStatement.setInt(2, request.offset());
 
-        }else{
+        } else {
             /* クエリのためのパラメータを用意 */
             queryForPreparedStatement = makeQueryForSearchBooks(request, false);
             preparedStatement = controller.preparedStatement(queryForPreparedStatement);
             setSearchRulesToStatement(preparedStatement, request, true);
         }
-        System.out.println(queryForPreparedStatement);
         return preparedStatement;
     }
 
@@ -296,23 +297,23 @@ public class BookDataService {
         initParameters();
 
         /* クエリのためのパラメータを用意 */
-        if(request.you()) {
+        if (request.you()) {
             queryForPreparedStatement = makeQueryForLendingList(true);
-        }else if(request.overdue()){
+        } else if (request.overdue()) {
             queryForPreparedStatement = makeQueryForOverdueList(true);
-        }else{
+        } else {
             queryForPreparedStatement = makeQueryForSearchBooks(request, true);
         }
 
         try {
             preparedStatement = dataBaseController.preparedStatement(queryForPreparedStatement);
             /* クエリのためのパラメータを用意 */
-            if(request.you()) {
+            if (request.you()) {
                 // ユーザーの貸出中リストを取得するときはパラメータは1つだけ
                 preparedStatement.setInt(1, requestUser.id());
-            }else if(request.overdue()){
+            } else if (request.overdue()) {
                 /* do nothing */
-            }else{
+            } else {
                 setSearchRulesToStatement(preparedStatement, request, false);
             }
 
@@ -328,5 +329,79 @@ public class BookDataService {
             dataBaseController.close();
         }
         return 0;
+    }
+
+    public boolean addNewBook(AddBookRequest request) throws SQLException {
+        //int result = false;
+        int result = 0;
+        Date sqlDate = new Date(request.boughtDate().getTime());
+
+        initParameters();
+
+        try {
+            preparedStatement = dataBaseController.preparedStatement(INSERT_BOOK_QUERY);
+            /* 値のセット */
+            preparedStatement.setInt(1, request.bookId());
+            preparedStatement.setDate(2, sqlDate);
+            preparedStatement.setInt(3, request.purchaserId());
+            result = preparedStatement.executeUpdate();
+            if (result == 1) {
+                dataBaseController.commit();
+                return true;
+            } else {
+                dataBaseController.rollback();
+                return false;
+            }
+        } catch (PSQLException psqlException) {
+            if (nonNull(dataBaseController)) {
+                dataBaseController.rollback();
+                dataBaseController.close();
+            }
+            throw psqlException;
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            if (nonNull(dataBaseController)) {
+                dataBaseController.rollback();
+                dataBaseController.close();
+            }
+        }
+        return false;
+    }
+
+    public Integer addNewMasterData(AddBookMasterRequest request) throws SQLException {
+        Integer result = null;
+        initParameters();
+
+        try {
+            preparedStatement = dataBaseController.preparedStatement(INSERT_BOOK_MASTER_QUERY);
+            /* 値のセット */
+            preparedStatement.setString(1, request.name());
+            preparedStatement.setString(2, request.author());
+            preparedStatement.setInt(3, request.publisherId());
+            preparedStatement.setInt(4, request.categoryId());
+            preparedStatement.setString(5, request.isbn());
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                result = resultSet.getInt("id");
+                dataBaseController.commit();
+                close();
+            } else {
+                dataBaseController.rollback();
+                close();
+            }
+        } catch (PSQLException psqlException) {
+            if (nonNull(dataBaseController)) {
+                dataBaseController.rollback();
+                dataBaseController.close();
+            }
+            throw psqlException;
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            if (nonNull(dataBaseController)) {
+                dataBaseController.rollback();
+                dataBaseController.close();
+            }
+        }
+        return result;
     }
 }

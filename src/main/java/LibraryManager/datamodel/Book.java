@@ -9,12 +9,10 @@ public class Book {
     private final int id;
     private final String title;
     private final String author;
-    @Expose
-    private final int publisherId;
+    private transient int publisherId;
     @SerializedName("publisher")
     private final String publisherName;
-    @Expose
-    private final int categoryId;
+    private transient final int categoryId;
     @SerializedName("category")
     private final String categoryName;
     private final String isbn;

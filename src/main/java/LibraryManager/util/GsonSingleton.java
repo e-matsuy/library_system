@@ -1,5 +1,6 @@
 package LibraryManager.util;
 
+import LibraryManager.datamodel.AddPublisherRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -9,6 +10,8 @@ public final class GsonSingleton {
     private static final Gson GSON_INSTANCE = new GsonBuilder()
                                                     .setLenient()
                                                     .serializeNulls()
+                                                    //.setPrettyPrinting()
+                                                    .disableHtmlEscaping()
                                                     .setDateFormat("yyyy/MM/dd")
                                                     .create();
 

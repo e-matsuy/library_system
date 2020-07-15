@@ -1,11 +1,9 @@
 package LibraryManager;
 
-import LibraryManager.datamodel.Book;
-import LibraryManager.datamodel.BookListRequest;
-import LibraryManager.datamodel.BookListResponse;
-import LibraryManager.datamodel.Role;
+import LibraryManager.datamodel.*;
 import LibraryManager.service.BookDataService;
 import LibraryManager.util.GsonSingleton;
+import org.postgresql.util.PSQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
@@ -15,15 +13,10 @@ import static java.util.Objects.nonNull;
 
 public class BookDataController extends AbstractController{
 
-    private static String INVALID_USER_REQUEST_MESSAGE = "一般ユーザーに許可されていないリクエストです";
     private BookDataService bookDataService = null;
 
     private int calcNowPageNumber(int offset, int size){
         return (offset / size ) + 1;
-    }
-
-    private String generateBookListResponseString(BookListResponse bookListResponse){
-        return GsonSingleton.toJson(bookListResponse);
     }
 
     public String getBooks(String token, HttpServletRequest httpServletRequest){
@@ -59,6 +52,40 @@ public class BookDataController extends AbstractController{
 
         bookListResponse = new BookListResponse(books, pageCount, resultCount);
 
-        return generateBookListResponseString(bookListResponse);
+        return returnSuccessResponse(bookListResponse);
+    }
+
+    public String addBook(String token, AddBookRequest request){
+        boolean result = false;
+        bookDataService = new BookDataService();
+
+        /* トークンの期限と署名を確認してユーザーを取り出す */
+        String checkTokenResult = checkToken(token);
+        /* トークンに異常あり */
+        if(nonNull(checkTokenResult)){
+            return checkTokenResult;
+        }
+        /* 権限が無い時 */
+        if(requestUser.role() != Role.admin){
+            return returnFailedResponse(INVALID_USER_REQUEST_MESSAGE);
+        }
+
+        try {
+            if (bookDataService.addNewBook(request)) {
+                bookDataService.close();
+                return returnSuccessResponse(null);
+            }else{
+                return returnFailedResponse(INSERT_FAILED_ERROR_MESSAGE);
+            }
+        }catch(PSQLException psqlException){
+            /* 外部キー制約に引っかかった時のException */
+            bookDataService.close();
+            return returnFailedResponse(FOREIGN_KEY_ERROR_MESSAGE);
+        }catch (SQLException sqlException){
+            sqlException.printStackTrace();
+            bookDataService.close();
+            return returnFailedResponse(DATABASE_CONNECTION_ERROR_MESSAGE);
+        }
+
     }
 }

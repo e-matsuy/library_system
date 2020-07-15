@@ -75,4 +75,10 @@ public class DataBaseController {
         return connection.prepareStatement(query);
     }
 
+    public boolean isClosed() throws SQLException {
+        if(nonNull(connection)){
+            return connection.isClosed();
+        }
+        return true;
+    }
 }

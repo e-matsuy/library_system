@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name="LibraryManager", urlPatterns = {"/login", "/"})
+@WebServlet(name="LibraryManager", urlPatterns = {"/login"})
 public class LoginPageServlet extends HttpServlet {
     static final String CONTENT_TYPE_JSON = "application/json";
     LoginController loginController = new LoginController();

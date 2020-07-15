@@ -1,5 +1,8 @@
 package LibraryManager.datamodel;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import javax.xml.crypto.Data;
 import java.util.Date;
 
@@ -8,13 +11,15 @@ import java.util.Date;
  */
 public class User implements DataTrasferObject {
     private final int id;
+    @SerializedName("employee_number")
     private final String employeeNumber;
     private final String name;
+    @SerializedName("name_kana")
     private final String nameKana;
-    private final String mailAddress;
-    private final Role role;
-    private final Date dateOfHire;
-    private final String password;
+    private transient final String mailAddress;
+    private transient final Role role;
+    private transient final Date dateOfHire;
+    private transient final String password;
 
     public User(int id, String employeeNumber, String name, String nameKana, String mailAddress, Role role, Date datOfHire, String password) {
         this.id = id;
