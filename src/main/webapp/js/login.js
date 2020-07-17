@@ -2,7 +2,7 @@ const loginSuccessCallback = function(response){
     if(checkRequestSuccess(response)){
         /*リクエスト正常*/
         sessionStorage.setItem("library_token", response["data"]["token"])
-        window.location = "booklist.html";
+        window.location = "booklist";
     }else{
         /*異常*/
         window.alert(response["text"]);

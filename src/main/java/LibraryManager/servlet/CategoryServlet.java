@@ -14,8 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet(name="categoryApi", urlPatterns = {"/api/categories"})
-public class CategoryServlet extends HttpServlet implements NeedAuth {
-    static final String CONTENT_TYPE_JSON = "application/json";
+public class CategoryServlet extends HttpServlet implements NeedAuth, ReturnJson {
     MasterDataController controller = new MasterDataController();
 
     @Override

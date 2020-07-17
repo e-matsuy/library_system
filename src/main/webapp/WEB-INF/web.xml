@@ -5,4 +5,12 @@
            http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
   <display-name>Tomcat Sample Application</display-name>
+  <servlet>
+    <servlet-name>BookListPage</servlet-name>
+    <jsp-file>/WEB-INF/BookListPage.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>BookListPage</servlet-name>
+    <url-pattern>/booklist</url-pattern>
+  </servlet-mapping>
 </web-app>

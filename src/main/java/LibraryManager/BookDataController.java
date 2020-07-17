@@ -12,7 +12,8 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 public class BookDataController extends AbstractController{
-
+    private static final String FAILED_CHECKOUT_BOOK_ERROR = "対象の書籍が貸出中であるか、あなたの貸出中書籍が3冊に達しています";
+    private static final String FAILED_RETURN_BOOK_ERROR = "対象の書籍が貸し出されていないか、あなたが借りた書籍ではありません";
     private BookDataService bookDataService = null;
 
     private int calcNowPageNumber(int offset, int size){
@@ -86,6 +87,55 @@ public class BookDataController extends AbstractController{
             bookDataService.close();
             return returnFailedResponse(DATABASE_CONNECTION_ERROR_MESSAGE);
         }
+    }
 
+    public String checkout(String token, CheckoutRequest request){
+        bookDataService = new BookDataService();
+
+        /* トークンの期限と署名を確認してユーザーを取り出す */
+        String checkTokenResult = checkToken(token);
+        /* トークンに異常あり */
+        if(nonNull(checkTokenResult)){
+            return checkTokenResult;
+        }
+
+        try{
+            if(bookDataService.checkout(request, requestUser)){
+                bookDataService.close();
+                return returnSuccessResponse(null);
+            }else{
+                bookDataService.close();
+                return returnFailedResponse(FAILED_CHECKOUT_BOOK_ERROR);
+            }
+        }catch (SQLException sqlException){
+            sqlException.printStackTrace();
+            bookDataService.close();
+            return returnFailedResponse(DATABASE_CONNECTION_ERROR_MESSAGE);
+        }
+    }
+
+    public String returnBook(String token, ReturnRequest request){
+        bookDataService = new BookDataService();
+
+        /* トークンの期限と署名を確認してユーザーを取り出す */
+        String checkTokenResult = checkToken(token);
+        /* トークンに異常あり */
+        if(nonNull(checkTokenResult)){
+            return checkTokenResult;
+        }
+
+        try{
+            if(bookDataService.returnBook(request, requestUser)){
+                bookDataService.close();
+                return returnSuccessResponse(null);
+            }else{
+                bookDataService.close();
+                return returnFailedResponse(FAILED_RETURN_BOOK_ERROR);
+            }
+        }catch (SQLException sqlException){
+            sqlException.printStackTrace();
+            bookDataService.close();
+            return returnFailedResponse(DATABASE_CONNECTION_ERROR_MESSAGE);
+        }
     }
 }
